@@ -317,7 +317,7 @@
       canPlay &&
       game.selected !== null &&
       game.selected >= 0 &&
-      game.board[game.selected] !== game.puzzle[game.selected];
+      game.puzzle[game.selected] === 0;
     const selected = canPlay && game.selected >= 0 ? game.selected : null;
     const selectedHasValue = selected !== null && game.board[selected] !== 0;
 
