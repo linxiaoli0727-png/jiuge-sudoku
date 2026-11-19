@@ -799,6 +799,18 @@ kbd {
   transform: translate(-50%, 0);
 }
 
+.creator-credit {
+  position: fixed;
+  right: 10px;
+  bottom: 7px;
+  z-index: 2;
+  margin: 0;
+  color: rgba(89, 99, 95, 0.42);
+  font-size: 7px;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
