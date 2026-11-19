@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="一款简洁的单机数独游戏，支持三档难度、连胜升级和本地进度保存。"
+    />
+    <title>九格 · 单机数独</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="paper-grain" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <header class="topbar">
+        <button class="brand" id="brandButton" type="button" aria-label="返回首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </span>
+          <span class="brand-copy">
+            <strong>九格</strong>
+            <small>SUDOKU</small>
+          </span>
+        </button>
+
+        <div class="best-chip" aria-label="历史最高连续胜场">
+          <span>最高连胜</span>
+          <strong id="headerBest">0</strong>
+        </div>
+      </header>
+
+      <section class="screen welcome-screen" id="welcomeScreen">
+        <div class="welcome-grid">
+          <div class="hero-copy">
+            <p class="eyebrow"><span></span> 单机数独 · 静心一局</p>
+            <h1>留一点空白，<br /><em>把九格填满。</em></h1>
+            <p class="hero-description">
+              每局都是新的题目。选一个舒服的节奏，填对数字，连续赢下五局就能进入下一阶。
+            </p>
+            <div class="hero-notes" aria-label="游戏规则摘要">
+              <div><strong>5</strong><span>次容错</span></div>
+              <div><strong>5</strong><span>局升阶</span></div>
+              <div><strong>∞</strong><span>不设时限</span></div>
+            </div>
+          </div>
+
+          <div class="setup-card">
+            <div class="setup-heading">
+              <div>
+                <p class="section-kicker">选择难度</p>
+                <h2>今天想坐多久？</h2>
+              </div>
+              <span class="session-streak" id="menuStreak">连胜 0</span>
+            </div>
+
+            <fieldset class="difficulty-list" id="difficultyList">
+              <legend class="sr-only">选择游戏难度</legend>
+              <label class="difficulty-option" data-level="easy">
+                <input type="radio" name="difficulty" value="easy" checked />
+                <span class="difficulty-index">01</span>
+                <span class="difficulty-copy">
+                  <strong>轻松</strong>
+                  <small>42 个提示 · 慢慢进入状态</small>
+                </span>
+                <span class="radio-mark" aria-hidden="true"></span>
+              </label>
+              <label class="difficulty-option" data-level="medium">
+                <input type="radio" name="difficulty" value="medium" />
+                <span class="difficulty-index">02</span>
+                <span class="difficulty-copy">
+                  <strong>进阶</strong>
+                  <small>34 个提示 · 需要多推一步</small>
+                </span>
+                <span class="radio-mark" aria-hidden="true"></span>
+              </label>
+              <label class="difficulty-option" data-level="hard">
+                <input type="radio" name="difficulty" value="hard" />
+                <span class="difficulty-index">03</span>
+                <span class="difficulty-copy">
+                  <strong>挑战</strong>
+                  <small>28 个提示 · 无限挑战模式</small>
+                </span>
+                <span class="radio-mark" aria-hidden="true"></span>
+              </label>
+            </fieldset>
+
+            <button class="primary-button" id="startButton" type="button">
+              <span>开始新局</span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </button>
+            <p class="privacy-note">
+              每题随机生成并保证唯一解 · 游戏进度仅保存在本机
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen game-screen is-hidden" id="gameScreen">
+        <div class="game-heading">
+          <button class="text-button" id="menuButton" type="button">
+            <span aria-hidden="true">←</span> 难度与记录
+          </button>
+          <div class="level-heading">
+            <span class="status-dot" aria-hidden="true"></span>
+            <strong id="levelLabel">轻松</strong>
+            <span class="level-divider"></span>
+            <span id="levelProgress">本级连胜 0 / 5</span>
+          </div>
+          <span class="game-number" id="gameNumber">第 1 局</span>
+        </div>
+
+        <div class="play-layout">
+          <div class="board-column">
+            <div class="board-frame">
+              <div
+                class="sudoku-board"
+                id="sudokuBoard"
+                role="grid"
+                aria-label="数独棋盘"
+              ></div>
+            </div>
+            <p class="board-hint">
+              点击空格后输入数字，也可使用键盘 <kbd>1</kbd>–<kbd>9</kbd> 和方向键
+            </p>
+          </div>
+
+          <aside class="control-column" aria-label="游戏操作区">
+            <section class="mistake-card" aria-live="polite">
+              <div class="mistake-heading">
+                <span>本局错误</span>
+                <strong><span id="mistakeCount">0</span> / 5</strong>
+              </div>
+              <div class="mistake-dots" id="mistakeDots" aria-hidden="true"></div>
+              <p id="mistakeMessage">还有 5 次机会</p>
+            </section>
+
+            <section class="numpad-card">
+              <div class="numpad-heading">
+                <span>填入数字</span>
+                <span class="selected-value" id="selectedValue">未选择</span>
+              </div>
+              <div class="number-pad" id="numberPad" aria-label="数字键盘"></div>
+              <button class="erase-button" id="eraseButton" type="button">
+                <span aria-hidden="true">⌫</span>
+                擦除当前格
+              </button>
+            </section>
+
+            <section class="rule-card">
+              <span class="rule-number">5</span>
+              <p>累计填错 5 次，本局立即结束。连胜会清零，但不影响已经保存的最高记录。</p>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="modal-backdrop is-hidden" id="resultModal" role="presentation">
+      <section
+        class="result-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="resultTitle"
+      >
+        <button
+          class="modal-close"
+          id="resultClose"
+          type="button"
+          aria-label="关闭结果窗口"
+        >
+          ×
+        </button>
+        <p class="result-kicker" id="resultKicker">本局结果</p>
+        <h2 id="resultTitle">九格填满</h2>
+        <p class="result-description" id="resultDescription"></p>
+        <div class="result-stats">
+          <div>
+            <span>连续胜场</span>
+            <strong id="resultStreak">0</strong>
+          </div>
+          <div>
+            <span>本局错误</span>
+            <strong id="resultMistakes">0</strong>
+          </div>
+        </div>
+        <button class="primary-button" id="resultContinue" type="button">
+          <span>再来一局</span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </button>
+        <button class="secondary-button" id="resultMenu" type="button">
+          返回难度选择
+        </button>
+      </section>
+    </div>
+
+    <script src="sudoku-engine.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
